@@ -1,0 +1,30 @@
+{
+  "dependencies": {
+    "@types/dotenv": "4.0.3",
+    "@types/node": "10.7.0",
+    "@types/request-promise-native": "1.0.15",
+    "@wireapp/bot-api": "0.2.28",
+    "cross-env": "5.2.0",
+    "dotenv": "6.0.0",
+    "request": "2.88.0"
+  },
+  "devDependencies": {
+    "prettier": "1.14.2",
+    "rimraf": "2.6.2",
+    "typescript": "3.0.1"
+  },
+  "license": "GPL-3.0",
+  "main": "dist/index.js",
+  "name": "wire-xkcd-bot",
+  "private": true,
+  "repository": "https://github.com/ffflorian/wire-xkcd-bot.git",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rimraf dist",
+    "dist": "yarn clean && yarn build",
+    "prettier": "prettier --write src/*.ts",
+    "start": "cross-env NODE_DEBUG=@wireapp/* node dist/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "1.0.0"
+}
