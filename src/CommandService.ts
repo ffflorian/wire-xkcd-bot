@@ -11,35 +11,15 @@ export interface ParsedCommand {
   rawCommand: string;
 }
 
-interface AnswerCommand {
-  command: string;
-  type: CommandType;
-}
-
 enum CommandType {
-  ANSWER_NO,
-  ANSWER_YES,
-  BOWER,
-  CRATES,
   HELP,
-  NO_COMMAND,
-  RANDOM,
   LATEST,
-  TYPES,
+  NO_COMMAND,
+  COMIC,
+  RANDOM,
   UNKNOWN_COMMAND,
   UPTIME,
 }
-
-const answerCommands: AnswerCommand[] = [
-  {
-    command: 'yes',
-    type: CommandType.ANSWER_YES,
-  },
-  {
-    command: 'no',
-    type: CommandType.ANSWER_NO,
-  },
-];
 
 const basicCommands: BasicCommand[] = [
   {
@@ -50,39 +30,27 @@ const basicCommands: BasicCommand[] = [
   },
   {
     command: 'latest',
-    description: 'Send the latest comic.',
+    description: 'Get the latest comic.',
     parseArguments: false,
     type: CommandType.LATEST,
   },
   {
-    command: 'number',
-    description: 'Send a comic.',
+    command: 'comic',
+    description: 'Get a comic.',
+    parseArguments: true,
+    type: CommandType.COMIC,
+  },
+  {
+    command: 'uptime',
+    description: 'Get the current uptime of this bot.',
     parseArguments: false,
     type: CommandType.UPTIME,
   },
   {
     command: 'random',
-    description: 'Send a random comic.',
-    parseArguments: true,
+    description: 'Get a random comic.',
+    parseArguments: false,
     type: CommandType.RANDOM,
-  },
-  {
-    command: 'bower',
-    description: 'Search for a package on Bower.',
-    parseArguments: true,
-    type: CommandType.BOWER,
-  },
-  {
-    command: 'types',
-    description: 'Search for type definitions on TypeSearch.',
-    parseArguments: true,
-    type: CommandType.TYPES,
-  },
-  {
-    command: 'crates',
-    description: 'Search for a package on crates.io.',
-    parseArguments: true,
-    type: CommandType.CRATES,
   },
 ];
 
@@ -94,15 +62,6 @@ const CommandService = {
   },
   parseCommand(message: string): ParsedCommand {
     const messageMatch = message.match(/\/(\w+)(?: (.*))?/);
-
-    for (const answerCommand of answerCommands) {
-      if (message.toLowerCase() === answerCommand.command) {
-        return {
-          commandType: answerCommand.type,
-          rawCommand: message.toLowerCase(),
-        };
-      }
-    }
 
     if (messageMatch && messageMatch.length) {
       const parsedCommand = messageMatch[1].toLowerCase();

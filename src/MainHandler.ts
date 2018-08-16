@@ -9,8 +9,7 @@ import {XKCDService} from './XKCDService';
 const {version}: {version: string} = require('../package.json');
 
 class MainHandler extends MessageHandler {
-  private searchService: XKCDService;
-  private readonly helpText = `**Hello!** 😎 This is XKCD bot v${version} speaking.\n\nAvailable commands:\n${CommandService.formatCommands()}\n\nMore information about this bot: https://github.com/ffflorian/wire-xkcd-bot.\n\nPlease also visit https://xkcd.com`;
+  private readonly helpText = `**Hello!** 😎 This is XKCD bot v${version} speaking.\n\nAvailable commands:\n${CommandService.formatCommands()}\n\nMore information about this bot: https://github.com/ffflorian/wire-xkcd-bot.\n\nPlease also visit https://xkcd.com.`;
   private answerCache: {
     [conversationId: string]: {
       content?: string;
@@ -22,7 +21,6 @@ class MainHandler extends MessageHandler {
 
   constructor() {
     super();
-    this.searchService = new XKCDService();
     this.answerCache = {};
   }
 
@@ -43,44 +41,15 @@ class MainHandler extends MessageHandler {
     }
   }
 
-  private static morePagesText(moreResults: number, resultsPerPage: number): string {
-    const isOne = moreResults === 1;
-    return `\n\nThere ${isOne ? 'is' : 'are'} ${moreResults} more result${
-      isOne ? '' : 's'
-    }. Would you like to see ${resultsPerPage} more? Answer with "yes" or "no".`;
-  }
-
   async handleText(conversationId: string, text: string, messageId: string): Promise<void> {
     const {commandType, content, rawCommand} = CommandService.parseCommand(text);
+    const {type, waitingForContent} = this.answerCache[conversationId];
 
-    switch (commandType) {
-      case CommandType.ANSWER_NO:
-      case CommandType.ANSWER_YES:
-      case CommandType.NO_COMMAND:
-      case CommandType.UNKNOWN_COMMAND:
-        break;
-      default:
-        await this.sendReaction(conversationId, messageId, ReactionType.LIKE);
-    }
-
-    if (this.answerCache[conversationId]) {
-      const {content: cachedContent, type, page, waitingForContent} = this.answerCache[conversationId];
+    if (this.answerCache[conversationId] && waitingForContent) {
       if (waitingForContent) {
         await this.sendReaction(conversationId, messageId, ReactionType.LIKE);
         delete this.answerCache[conversationId];
         return this.answer(conversationId, {content, commandType: type, rawCommand});
-      }
-      switch (commandType) {
-        case CommandType.ANSWER_YES: {
-          await this.sendReaction(conversationId, messageId, ReactionType.LIKE);
-          return this.answer(conversationId, {content: cachedContent, commandType: type, rawCommand}, page + 1);
-        }
-        case CommandType.ANSWER_NO: {
-          await this.sendReaction(conversationId, messageId, ReactionType.LIKE);
-          delete this.answerCache[conversationId];
-          await this.sendText(conversationId, 'Okay.');
-          return;
-        }
       }
     }
 
@@ -94,32 +63,60 @@ class MainHandler extends MessageHandler {
         return this.sendText(conversationId, this.helpText);
       case CommandType.UPTIME:
         return this.sendText(conversationId, `Current uptime: ${toHHMMSS(process.uptime().toString())}`);
-      case CommandType.BOWER: {
+      case CommandType.RANDOM: {
+        const {data, index} = await XKCDService.getRandomComic();
+
+        const image = {
+          data,
+          height: 289,
+          type: 'image/png',
+          width: 429,
+        };
+
+        await this.sendImage(conversationId, image);
+        return this.sendText(conversationId, `Permanent link: https://xkcd.com/${index}`);
+      }
+      case CommandType.COMIC: {
         if (!content) {
           this.answerCache[conversationId] = {
             page,
-            type: CommandType.BOWER,
+            type: CommandType.COMIC,
             waitingForContent: true,
           };
-          return this.sendText(conversationId, 'What would you like to search on Bower?');
+          return this.sendText(conversationId, 'Which comic would you like to see?');
         }
-        await this.sendText(conversationId, `Searching for "${content}" on Bower ...`);
-        let {result, moreResults, resultsPerPage} = await this.searchService.searchXKCD(content, page);
-        if (moreResults > 0) {
-          result += MainHandler.morePagesText(moreResults, resultsPerPage);
-          this.answerCache[conversationId] = {
-            page,
-            type: CommandType.BOWER,
-            waitingForContent: false,
-          };
-        } else {
-          delete this.answerCache[conversationId];
-        }
-        return this.sendText(conversationId, result);
-      }
 
-      case CommandType.UNKNOWN_COMMAND:
+        const {data, index} = await XKCDService.getComic(Number(content));
+
+        const image = {
+          data,
+          height: 289,
+          type: 'image/png',
+          width: 429,
+        };
+
+        await this.sendImage(conversationId, image);
+        return this.sendText(conversationId, `Permanent link: https://xkcd.com/${index}`);
+      }
+      case CommandType.LATEST: {
+        const {data, index} = await XKCDService.getLatestComic();
+
+        const image = {
+          data,
+          height: 289,
+          type: 'image/png',
+          width: 429,
+        };
+
+        await this.sendImage(conversationId, image);
+        return this.sendText(conversationId, `Permanent link: https://xkcd.com/${index}`);
+      }
+      case CommandType.UNKNOWN_COMMAND: {
         return this.sendText(conversationId, `Sorry, I don't know the command "${rawCommand}" yet.`);
+      }
+      default: {
+        return this.sendText(conversationId, `Sorry, "${rawCommand}" is not implemented yet.`);
+      }
     }
   }
 

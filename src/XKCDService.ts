@@ -1,83 +1,76 @@
 import * as request from 'request';
 
-interface LibrariesResult {
-  description: string;
-  homepage: string;
-  language: string;
-  latest_release_number: string;
-  latest_release_published_at: string;
-  name: string;
-  stars: number;
+interface ComicResult {
+  data: Buffer;
+  index: number;
 }
 
-interface SearchResult {
-  moreResults: number;
-  result: string;
-  resultsPerPage: number;
-}
+const baseUrl = 'https://xkcd.com';
 
-class XKCDService {
-  private readonly resultsPerPage: number;
-  constructor() {
-    this.resultsPerPage = 10;
-  }
-
-  private static apiRequest(options: request.OptionsWithUrl): Promise<SearchResult> {
-    return new Promise((resolve, reject) =>
-      request.get(options, (err: Error, result) => {
-        const {headers, body} = result;
-        const totalResults = Number(headers['total']) || 1;
-        const moreResults = Math.max(Math.ceil(totalResults - options.qs.page * options.qs.per_page), 0);
-        resolve({
-          result: body,
-          resultsPerPage: options.qs.per_page,
-          moreResults,
-        });
-      })
-    );
-  }
-
-  private buildOptions(platform: string, query: string, page = 1): request.OptionsWithUrl {
-    return {
-      strictSSL: true,
-      url: 'https://libraries.io/api/search/',
-      qs: {
-        page,
-        per_page: this.resultsPerPage,
-        platforms: platform,
-        q: query,
+const XKCDService = {
+  makeRequest(url: string, options: request.CoreOptions = {}): Promise<request.Response> {
+    options = {
+      ...options,
+      headers: {
+        ...options.headers,
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0',
       },
     };
-  }
+    return new Promise((resolve, reject) =>
+      request.get(url, options, (error: Error, result) => {
+        if (error) {
+          reject(error);
+        }
+        resolve(result);
+      })
+    );
+  },
 
-  private formatResult(results: LibrariesResult[]): string {
-    return results.reduce((prev, res) => {
-      const {description, homepage, name, language, stars} = res;
-      const localeStarsCount = Number(stars.toLocaleString());
-      const hasStars =
-        localeStarsCount && localeStarsCount > 0
-          ? `, ${localeStarsCount} star${localeStarsCount === 1 ? '' : 's'}`
-          : '';
-      const hasHomepage = homepage ? ` (${homepage})` : '';
-      return prev + `\n- **${name}** (${language}${hasStars}): ${description}${hasHomepage}`;
-    }, '');
-  }
+  extractIndex(rawContentBody: string): number {
+    const regexResult =
+      new RegExp('Permanent link to this comic: https://xkcd.com/([0-9]+)/', 'gmi').exec(rawContentBody) || [];
+    return Number(regexResult[1]);
+  },
 
-  async searchXKCD(query: string, page: number): Promise<SearchResult> {
-    const options = this.buildOptions('bower', query, page);
-    const {result: rawResult, moreResults} = await XKCDService.apiRequest(options);
-    try {
-      const parsedJSON: LibrariesResult[] = JSON.parse(rawResult);
-      const result = this.formatResult(parsedJSON);
-      return {
-        moreResults,
-        result,
-        resultsPerPage: this.resultsPerPage,
-      };
-    } catch (error) {
-      throw new Error('Could not parse JSON.');
-    }
-  }
-}
+  async getRandomComic(): Promise<ComicResult> {
+    const {body: rawContentBody} = await XKCDService.makeRequest('https://c.xkcd.com/random/comic/');
+    const imageUrl = XKCDService.extractImageUrl(rawContentBody);
+    const imageResult = await XKCDService.makeRequest(`https:${imageUrl}`, {encoding: null});
+    const index = XKCDService.extractIndex(rawContentBody);
+
+    return {
+      data: imageResult.body,
+      index,
+    };
+  },
+
+  extractImageUrl(rawContentBody: string): string {
+    const regexResult = new RegExp('<div id="comic">\n<img src="([^"]+)"', 'gmi').exec(rawContentBody) || [];
+    return regexResult[1];
+  },
+
+  async getLatestComic(): Promise<ComicResult> {
+    const {body: rawContentBody} = await XKCDService.makeRequest(baseUrl);
+    const index = XKCDService.extractIndex(rawContentBody);
+    const imageUrl = XKCDService.extractImageUrl(rawContentBody);
+    const imageResult = await XKCDService.makeRequest(`https:${imageUrl}`, {encoding: null});
+
+    return {
+      data: imageResult.body,
+      index,
+    };
+  },
+
+  async getComic(index: number): Promise<ComicResult> {
+    const {body: rawContentBody} = await XKCDService.makeRequest(`${baseUrl}/${index}`);
+    const imageUrl = XKCDService.extractImageUrl(rawContentBody);
+    const imageResult = await XKCDService.makeRequest(`https:${imageUrl}`, {encoding: null});
+
+    return {
+      data: imageResult.body,
+      index,
+    };
+  },
+};
 
 export {XKCDService};
