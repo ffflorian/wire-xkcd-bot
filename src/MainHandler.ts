@@ -31,7 +31,7 @@ class MainHandler extends MessageHandler {
     super();
     this.developerConversationId = developerConversationId;
     this.answerCache = {};
-    this.logger = logdown('wire-xkcd-bot', {
+    this.logger = logdown('wire-xkcd-bot/MainHandler', {
       logger: console,
       markdown: false,
     });
@@ -100,7 +100,7 @@ class MainHandler extends MessageHandler {
           return this.sendText(conversationId, 'Sorry, an error occured. Please try again later.');
         }
 
-        const {comment, data, index} = comicResult;
+        const {comment, data, index, title} = comicResult;
 
         const image = {
           data,
@@ -109,10 +109,12 @@ class MainHandler extends MessageHandler {
           width: 429,
         };
 
-        await this.sendText(conversationId, `Here is your XKCD comic #${index} (https://xkcd.com/${index}):`);
+        await this.sendText(
+          conversationId,
+          `Here is your XKCD comic #${index} (https://xkcd.com/${index}) titled "${title}":`
+        );
         await this.sendImage(conversationId, image);
-        setTimeout(() => this.sendText(conversationId, `> ${comment}`), 10000);
-        return;
+        return this.sendText(conversationId, `> ${comment}`);
       }
       case CommandType.COMIC: {
         if (!content) {
@@ -144,7 +146,7 @@ class MainHandler extends MessageHandler {
           }
         }
 
-        const {comment, data, index} = comicResult;
+        const {comment, data, index, title} = comicResult;
 
         const image = {
           data,
@@ -153,10 +155,12 @@ class MainHandler extends MessageHandler {
           width: 429,
         };
 
-        await this.sendText(conversationId, `Here is your XKCD comic #${index} (https://xkcd.com/${index}):`);
+        await this.sendText(
+          conversationId,
+          `Here is your XKCD comic #${index} (https://xkcd.com/${index}) titled "${title}":`
+        );
         await this.sendImage(conversationId, image);
-        setTimeout(() => this.sendText(conversationId, `> ${comment}`), 10000);
-        return;
+        return this.sendText(conversationId, `> ${comment}`);
       }
       case CommandType.LATEST: {
         let comicResult;
@@ -168,7 +172,7 @@ class MainHandler extends MessageHandler {
           return this.sendText(conversationId, 'Sorry, an error occured. Please try again later.');
         }
 
-        const {comment, data, index} = comicResult;
+        const {comment, data, index, title} = comicResult;
 
         const image = {
           data,
@@ -177,10 +181,12 @@ class MainHandler extends MessageHandler {
           width: 429,
         };
 
-        await this.sendText(conversationId, `Here is your XKCD comic #${index} (https://xkcd.com/${index}):`);
+        await this.sendText(
+          conversationId,
+          `Here is your XKCD comic #${index} (https://xkcd.com/${index}) titled "${title}":`
+        );
         await this.sendImage(conversationId, image);
-        setTimeout(() => this.sendText(conversationId, `> ${comment}`), 10000);
-        return;
+        return this.sendText(conversationId, `> ${comment}`);
       }
       case CommandType.FEEDBACK: {
         if (!this.developerConversationId) {
