@@ -43,9 +43,17 @@ class MainHandler extends MessageHandler {
 
   async handleText(conversationId: string, text: string, messageId: string): Promise<void> {
     const {commandType, content, rawCommand} = CommandService.parseCommand(text);
-    const {type, waitingForContent} = this.answerCache[conversationId];
 
-    if (this.answerCache[conversationId] && waitingForContent) {
+    switch (commandType) {
+      case CommandType.NO_COMMAND:
+      case CommandType.UNKNOWN_COMMAND:
+        break;
+      default:
+        await this.sendReaction(conversationId, messageId, ReactionType.LIKE);
+    }
+
+    if (this.answerCache[conversationId]) {
+      const {type, waitingForContent} = this.answerCache[conversationId];
       if (waitingForContent) {
         await this.sendReaction(conversationId, messageId, ReactionType.LIKE);
         delete this.answerCache[conversationId];
@@ -96,7 +104,7 @@ class MainHandler extends MessageHandler {
         };
 
         await this.sendImage(conversationId, image);
-        return this.sendText(conversationId, `Permanent link: https://xkcd.com/${index}`);
+        return this.sendText(conversationId, `Permanent link: https://xkcd.com/${index}/`);
       }
       case CommandType.LATEST: {
         const {data, index} = await XKCDService.getLatestComic();

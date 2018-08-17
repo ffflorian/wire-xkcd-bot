@@ -1,3 +1,6 @@
+process.on('uncaughtException', error => console.error(`Uncaught exception: ${error.message}`, error));
+process.on('unhandledRejection', error => console.error(`Uncaught rejection "${error.constructor.name}": ${error.message}`, error));
+
 import * as dotenv from 'dotenv';
 dotenv.config();
 
