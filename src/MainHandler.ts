@@ -46,7 +46,7 @@ class MainHandler extends MessageHandler {
       case PayloadBundleType.TEXT: {
         if (payload.conversation) {
           const messageContent = payload.content as TextContent;
-          return this.handleText(payload.conversation, messageContent.text, payload.id);
+          return this.handleText(payload.conversation, messageContent.text, payload.id, payload.from);
         }
       }
       case PayloadBundleType.CONNECTION_REQUEST: {
@@ -58,7 +58,7 @@ class MainHandler extends MessageHandler {
     }
   }
 
-  async handleText(conversationId: string, text: string, messageId: string): Promise<void> {
+  async handleText(conversationId: string, text: string, messageId: string, senderId: string): Promise<void> {
     const {commandType, content, rawCommand} = CommandService.parseCommand(text);
 
     switch (commandType) {
@@ -74,14 +74,14 @@ class MainHandler extends MessageHandler {
       if (waitingForContent) {
         await this.sendReaction(conversationId, messageId, ReactionType.LIKE);
         delete this.answerCache[conversationId];
-        return this.answer(conversationId, {content, commandType: type, rawCommand});
+        return this.answer(conversationId, {content, commandType: type, rawCommand}, senderId);
       }
     }
 
-    return this.answer(conversationId, {commandType, content, rawCommand});
+    return this.answer(conversationId, {commandType, content, rawCommand}, senderId);
   }
 
-  async answer(conversationId: string, parsedCommand: ParsedCommand, page = 1) {
+  async answer(conversationId: string, parsedCommand: ParsedCommand, senderId: string, page = 1) {
     const {content, rawCommand, commandType} = parsedCommand;
     switch (commandType) {
       case CommandType.HELP: {
@@ -202,7 +202,7 @@ class MainHandler extends MessageHandler {
           return this.sendText(conversationId, 'What would you like to tell the developer?');
         }
 
-        await this.sendText(this.developerConversationId, `Feedback from a user:\n\n"${content}"`);
+        await this.sendText(this.developerConversationId, `Feedback from user "${senderId}":\n\n"${content}"`);
         delete this.answerCache[conversationId];
         return this.sendText(conversationId, 'Thank you for your feedback.');
       }

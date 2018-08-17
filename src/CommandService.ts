@@ -89,7 +89,7 @@ const CommandService = {
 
       for (const command of basicCommands) {
         if (command.command === parsedCommand) {
-          logger.info(`Found command "${command.command}" for "${parsedCommand}".`);
+          logger.info(`Found command "${command.command}" for "/${parsedCommand}".`);
           return {
             commandType: command.type,
             content: command.parseArguments ? parsedArguments : '',
