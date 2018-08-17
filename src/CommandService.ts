@@ -1,4 +1,5 @@
 interface BasicCommand {
+  argumentName?: string;
   command: string;
   description: string;
   parseArguments: boolean;
@@ -12,6 +13,7 @@ export interface ParsedCommand {
 }
 
 enum CommandType {
+  FEEDBACK,
   HELP,
   LATEST,
   NO_COMMAND,
@@ -35,6 +37,7 @@ const basicCommands: BasicCommand[] = [
     type: CommandType.LATEST,
   },
   {
+    argumentName: 'number',
     command: 'comic',
     description: 'Get a comic.',
     parseArguments: true,
@@ -52,13 +55,23 @@ const basicCommands: BasicCommand[] = [
     parseArguments: false,
     type: CommandType.RANDOM,
   },
+  {
+    argumentName: 'text',
+    command: 'feedback',
+    description: 'Send feedback to the developer.',
+    parseArguments: true,
+    type: CommandType.FEEDBACK,
+  },
 ];
 
 const CommandService = {
   formatCommands(): string {
     return basicCommands
       .sort((a, b) => a.command.localeCompare(b.command))
-      .reduce((prev, command) => prev + `\n- **/${command.command}**: ${command.description}`, '');
+      .reduce((prev, command) => {
+        const {argumentName, command: commandName, description, parseArguments} = command;
+        return prev + `\n- **/${commandName}${parseArguments && argumentName ? ` <${argumentName}>` : ''}**: ${description}`;
+      }, '');
   },
   parseCommand(message: string): ParsedCommand {
     const messageMatch = message.match(/\/(\w+)(?: (.*))?/);

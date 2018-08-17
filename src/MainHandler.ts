@@ -8,7 +8,12 @@ import {XKCDService} from './XKCDService';
 
 const {version}: {version: string} = require('../package.json');
 
+interface Config {
+  developerConversationId?: string;
+};
+
 class MainHandler extends MessageHandler {
+  private readonly developerConversationId?: string;
   private readonly helpText = `**Hello!** 😎 This is XKCD bot v${version} speaking.\n\nAvailable commands:\n${CommandService.formatCommands()}\n\nMore information about this bot: https://github.com/ffflorian/wire-xkcd-bot.\n\nPlease also visit https://xkcd.com.`;
   private answerCache: {
     [conversationId: string]: {
@@ -19,9 +24,16 @@ class MainHandler extends MessageHandler {
     };
   };
 
-  constructor() {
+  constructor({
+    developerConversationId,
+  }: Config) {
     super();
+    this.developerConversationId = developerConversationId;
     this.answerCache = {};
+
+    if (!this.developerConversationId) {
+      console.warn('You did not specify a developer conversation ID and will not be able to receive feedback.');
+    }
   }
 
   async handleEvent(payload: PayloadBundleIncoming) {
@@ -154,6 +166,24 @@ class MainHandler extends MessageHandler {
 
         await this.sendImage(conversationId, image);
         return this.sendText(conversationId, `Permanent link: https://xkcd.com/${index}`);
+      }
+      case CommandType.FEEDBACK: {
+        if (!this.developerConversationId) {
+          return this.sendText(conversationId, `Sorry, the developer did not specify a feedback channel.`);
+        }
+
+        if (!content) {
+          this.answerCache[conversationId] = {
+            page,
+            type: CommandType.FEEDBACK,
+            waitingForContent: true,
+          };
+          return this.sendText(conversationId, 'What would you like to tell the developer?');
+        }
+
+        await this.sendText(this.developerConversationId, `Feedback from a user:\n\n"${content}"`);
+        delete this.answerCache[conversationId];
+        return this.sendText(conversationId, 'Thank you for your feedback.');
       }
       case CommandType.UNKNOWN_COMMAND: {
         return this.sendText(conversationId, `Sorry, I don't know the command "${rawCommand}" yet.`);

@@ -20,7 +20,9 @@ const bot = new Bot({
   password: process.env.WIRE_PASSWORD!,
 });
 
-const mainHandler = new MainHandler();
+const mainHandler = new MainHandler({
+  developerConversationId: process.env.DEVELOPER_CONVERSATION_ID!,
+});
 
 bot.addHandler(mainHandler);
 bot.start().catch(error => console.error(error));
