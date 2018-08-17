@@ -18,10 +18,16 @@ const XKCDService = {
     };
     return new Promise((resolve, reject) =>
       request.get(url, options, (error: Error, result) => {
-        if (error) {
-          reject(error);
+        if (result.statusCode === 404) {
+          return reject('Sorry, I could not find this.');
         }
-        resolve(result);
+        if (result.statusCode !== 200) {
+          return reject(`Sorry, something went wrong (status code ${result.statusCode}).`);
+        }
+        if (error) {
+          return reject(error.toString());
+        }
+        return resolve(result);
       })
     );
   },

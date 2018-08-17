@@ -67,12 +67,22 @@ class MainHandler extends MessageHandler {
   async answer(conversationId: string, parsedCommand: ParsedCommand, page = 1) {
     const {content, rawCommand, commandType} = parsedCommand;
     switch (commandType) {
-      case CommandType.HELP:
+      case CommandType.HELP: {
         return this.sendText(conversationId, this.helpText);
-      case CommandType.UPTIME:
+      }
+      case CommandType.UPTIME: {
         return this.sendText(conversationId, `Current uptime: ${toHHMMSS(process.uptime().toString())}`);
+      }
       case CommandType.RANDOM: {
-        const {data, index} = await XKCDService.getRandomComic();
+        let comicResult;
+
+        try {
+          comicResult = await XKCDService.getRandomComic();
+        } catch (error) {
+          return this.sendText(conversationId, error);
+        }
+
+        const {data, index} = comicResult;
 
         const image = {
           data,
@@ -94,7 +104,25 @@ class MainHandler extends MessageHandler {
           return this.sendText(conversationId, 'Which comic would you like to see?');
         }
 
-        const {data, index} = await XKCDService.getComic(Number(content));
+        let comicResult;
+
+        if (content === 'latest') {
+          try {
+            comicResult = await XKCDService.getLatestComic();
+          } catch (error) {
+            return this.sendText(conversationId, error);
+          }
+        } else if (!Number(content) || Number(content) < 1) {
+          return this.sendText(conversationId, 'Invalid number specified.');
+        } else {
+          try {
+            comicResult = await XKCDService.getComic(Number(content));
+          } catch (error) {
+            return this.sendText(conversationId, error);
+          }
+        }
+
+        const {data, index} = comicResult;
 
         const image = {
           data,
@@ -107,7 +135,15 @@ class MainHandler extends MessageHandler {
         return this.sendText(conversationId, `Permanent link: https://xkcd.com/${index}/`);
       }
       case CommandType.LATEST: {
-        const {data, index} = await XKCDService.getLatestComic();
+        let comicResult;
+
+        try {
+          comicResult = await XKCDService.getLatestComic();
+        } catch (error) {
+          return this.sendText(conversationId, error);
+        }
+
+        const {data, index} = comicResult;
 
         const image = {
           data,
