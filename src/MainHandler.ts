@@ -1,3 +1,5 @@
+import * as logdown from 'logdown';
+
 import {MessageHandler} from '@wireapp/bot-api';
 import {PayloadBundleIncoming, PayloadBundleType, ReactionType} from '@wireapp/core/dist/conversation/root';
 import {TextContent} from '@wireapp/core/dist/conversation/content/';
@@ -13,6 +15,7 @@ interface Config {
 }
 
 class MainHandler extends MessageHandler {
+  private readonly logger: logdown.Logger;
   private readonly developerConversationId?: string;
   private readonly helpText = `**Hello!** 😎 This is XKCD bot v${version} speaking.\n\nAvailable commands:\n${CommandService.formatCommands()}\n\nMore information about this bot: https://github.com/ffflorian/wire-xkcd-bot.\n\nPlease also visit https://xkcd.com.`;
   private answerCache: {
@@ -28,9 +31,13 @@ class MainHandler extends MessageHandler {
     super();
     this.developerConversationId = developerConversationId;
     this.answerCache = {};
+    this.logger = logdown('wire-xkcd-bot', {
+      logger: console,
+      markdown: false,
+    });
 
     if (!this.developerConversationId) {
-      console.warn('You did not specify a developer conversation ID and will not be able to receive feedback.');
+      this.logger.warn('You did not specify a developer conversation ID and will not be able to receive feedback.');
     }
   }
 
@@ -89,7 +96,7 @@ class MainHandler extends MessageHandler {
         try {
           comicResult = await XKCDService.getRandomComic();
         } catch (error) {
-          console.log(error);
+          this.logger.error(error);
           return this.sendText(conversationId, 'Sorry, an error occured. Please try again later.');
         }
 
@@ -123,7 +130,7 @@ class MainHandler extends MessageHandler {
           try {
             comicResult = await XKCDService.getLatestComic();
           } catch (error) {
-            console.log(error);
+            this.logger.error(error);
             return this.sendText(conversationId, 'Sorry, an error occured. Please try again later.');
           }
         } else if (!Number(content) || Number(content) < 1) {
@@ -132,7 +139,7 @@ class MainHandler extends MessageHandler {
           try {
             comicResult = await XKCDService.getComic(Number(content));
           } catch (error) {
-            console.log(error);
+            this.logger.error(error);
             return this.sendText(conversationId, 'Sorry, an error occured. Please try again later.');
           }
         }
@@ -157,7 +164,7 @@ class MainHandler extends MessageHandler {
         try {
           comicResult = await XKCDService.getLatestComic();
         } catch (error) {
-          console.log(error);
+          this.logger.error(error);
           return this.sendText(conversationId, 'Sorry, an error occured. Please try again later.');
         }
 
@@ -195,6 +202,9 @@ class MainHandler extends MessageHandler {
       }
       case CommandType.UNKNOWN_COMMAND: {
         return this.sendText(conversationId, `Sorry, I don't know the command "${rawCommand}" yet.`);
+      }
+      case CommandType.NO_COMMAND: {
+        return;
       }
       default: {
         return this.sendText(conversationId, `Sorry, "${rawCommand}" is not implemented yet.`);
