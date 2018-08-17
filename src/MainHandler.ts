@@ -10,7 +10,7 @@ const {version}: {version: string} = require('../package.json');
 
 interface Config {
   developerConversationId?: string;
-};
+}
 
 class MainHandler extends MessageHandler {
   private readonly developerConversationId?: string;
@@ -24,9 +24,7 @@ class MainHandler extends MessageHandler {
     };
   };
 
-  constructor({
-    developerConversationId,
-  }: Config) {
+  constructor({developerConversationId}: Config) {
     super();
     this.developerConversationId = developerConversationId;
     this.answerCache = {};
@@ -91,10 +89,11 @@ class MainHandler extends MessageHandler {
         try {
           comicResult = await XKCDService.getRandomComic();
         } catch (error) {
-          return this.sendText(conversationId, error);
+          console.log(error);
+          return this.sendText(conversationId, 'Sorry, an error occured. Please try again later.');
         }
 
-        const {data, index} = comicResult;
+        const {comment, data, index} = comicResult;
 
         const image = {
           data,
@@ -103,8 +102,10 @@ class MainHandler extends MessageHandler {
           width: 429,
         };
 
+        await this.sendText(conversationId, `Here is your XKCD comic #${index} (https://xkcd.com/${index}):`);
         await this.sendImage(conversationId, image);
-        return this.sendText(conversationId, `Permanent link: https://xkcd.com/${index}`);
+        setTimeout(() => this.sendText(conversationId, `> ${comment}`), 10000);
+        return;
       }
       case CommandType.COMIC: {
         if (!content) {
@@ -122,7 +123,8 @@ class MainHandler extends MessageHandler {
           try {
             comicResult = await XKCDService.getLatestComic();
           } catch (error) {
-            return this.sendText(conversationId, error);
+            console.log(error);
+            return this.sendText(conversationId, 'Sorry, an error occured. Please try again later.');
           }
         } else if (!Number(content) || Number(content) < 1) {
           return this.sendText(conversationId, 'Invalid number specified.');
@@ -130,11 +132,12 @@ class MainHandler extends MessageHandler {
           try {
             comicResult = await XKCDService.getComic(Number(content));
           } catch (error) {
-            return this.sendText(conversationId, error);
+            console.log(error);
+            return this.sendText(conversationId, 'Sorry, an error occured. Please try again later.');
           }
         }
 
-        const {data, index} = comicResult;
+        const {comment, data, index} = comicResult;
 
         const image = {
           data,
@@ -143,8 +146,10 @@ class MainHandler extends MessageHandler {
           width: 429,
         };
 
+        await this.sendText(conversationId, `Here is your XKCD comic #${index} (https://xkcd.com/${index}):`);
         await this.sendImage(conversationId, image);
-        return this.sendText(conversationId, `Permanent link: https://xkcd.com/${index}/`);
+        setTimeout(() => this.sendText(conversationId, `> ${comment}`), 10000);
+        return;
       }
       case CommandType.LATEST: {
         let comicResult;
@@ -152,10 +157,11 @@ class MainHandler extends MessageHandler {
         try {
           comicResult = await XKCDService.getLatestComic();
         } catch (error) {
-          return this.sendText(conversationId, error);
+          console.log(error);
+          return this.sendText(conversationId, 'Sorry, an error occured. Please try again later.');
         }
 
-        const {data, index} = comicResult;
+        const {comment, data, index} = comicResult;
 
         const image = {
           data,
@@ -164,8 +170,10 @@ class MainHandler extends MessageHandler {
           width: 429,
         };
 
+        await this.sendText(conversationId, `Here is your XKCD comic #${index} (https://xkcd.com/${index}):`);
         await this.sendImage(conversationId, image);
-        return this.sendText(conversationId, `Permanent link: https://xkcd.com/${index}`);
+        setTimeout(() => this.sendText(conversationId, `> ${comment}`), 10000);
+        return;
       }
       case CommandType.FEEDBACK: {
         if (!this.developerConversationId) {

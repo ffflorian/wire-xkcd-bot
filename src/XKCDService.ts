@@ -1,6 +1,7 @@
 import * as request from 'request';
 
 interface ComicResult {
+  comment: string;
   data: Buffer;
   index: number;
 }
@@ -18,18 +19,38 @@ const XKCDService = {
     };
     return new Promise((resolve, reject) =>
       request.get(url, options, (error: Error, result) => {
-        if (result.statusCode === 404) {
-          return reject('Sorry, I could not find this.');
-        }
-        if (result.statusCode !== 200) {
-          return reject(`Sorry, something went wrong (status code ${result.statusCode}).`);
+        if (result) {
+          if (result.statusCode === 404) {
+            return reject('Sorry, I could not find this.');
+          }
+          if (result.statusCode !== 200) {
+            return reject(`Sorry, something went wrong (status code ${result.statusCode}).`);
+          }
+          return resolve(result);
         }
         if (error) {
-          return reject(error.toString());
+          return reject(error);
         }
-        return resolve(result);
+        reject('No result and no error.');
       })
     );
+  },
+
+  extractImageTag(rawContentBody: string): string {
+    const regexResult = new RegExp('<div id="comic">\n(.*)\n', 'gmi').exec(rawContentBody) || [];
+    return regexResult[1];
+  },
+
+  extractComment(rawContentBody: string): string {
+    const imageTag = XKCDService.extractImageTag(rawContentBody);
+    const regexResult = new RegExp(' title="([^"]+)"', 'gmi').exec(imageTag) || [];
+    return regexResult[1];
+  },
+
+  extractImageUrl(rawContentBody: string): string {
+    const imageTag = XKCDService.extractImageTag(rawContentBody);
+    const regexResult = new RegExp(' src="([^"]+)"', 'gmi').exec(imageTag) || [];
+    return regexResult[1];
   },
 
   extractIndex(rawContentBody: string): number {
@@ -38,42 +59,57 @@ const XKCDService = {
     return Number(regexResult[1]);
   },
 
+  extractTitle(rawContentBody: string): number {
+    const imageTag = XKCDService.extractImageTag(rawContentBody);
+    const regexResult = new RegExp(' alt="([^"]+)"', 'gmi').exec(imageTag) || [];
+    return Number(regexResult[1]);
+  },
+
   async getRandomComic(): Promise<ComicResult> {
     const {body: rawContentBody} = await XKCDService.makeRequest('https://c.xkcd.com/random/comic/');
-    const imageUrl = XKCDService.extractImageUrl(rawContentBody);
-    const imageResult = await XKCDService.makeRequest(`https:${imageUrl}`, {encoding: null});
+    const comment = XKCDService.extractComment(rawContentBody);
     const index = XKCDService.extractIndex(rawContentBody);
+    const imageUrl = XKCDService.extractImageUrl(rawContentBody);
+    const data = await XKCDService.downloadImage(imageUrl);
 
     return {
-      data: imageResult.body,
+      comment,
+      data,
       index,
     };
   },
 
-  extractImageUrl(rawContentBody: string): string {
-    const regexResult = new RegExp('<div id="comic">\n<img src="([^"]+)"', 'gmi').exec(rawContentBody) || [];
-    return regexResult[1];
+  async downloadImage(imageUrl: string): Promise<Buffer> {
+    if (imageUrl.startsWith('//')) {
+      imageUrl = 'https:' + imageUrl;
+    }
+    const imageResult = await XKCDService.makeRequest(imageUrl, {encoding: null});
+    return imageResult.body;
   },
 
   async getLatestComic(): Promise<ComicResult> {
     const {body: rawContentBody} = await XKCDService.makeRequest(baseUrl);
-    const index = XKCDService.extractIndex(rawContentBody);
+    const comment = XKCDService.extractComment(rawContentBody);
     const imageUrl = XKCDService.extractImageUrl(rawContentBody);
-    const imageResult = await XKCDService.makeRequest(`https:${imageUrl}`, {encoding: null});
+    const data = await XKCDService.downloadImage(imageUrl);
+    const index = XKCDService.extractIndex(rawContentBody);
 
     return {
-      data: imageResult.body,
+      comment,
+      data,
       index,
     };
   },
 
   async getComic(index: number): Promise<ComicResult> {
     const {body: rawContentBody} = await XKCDService.makeRequest(`${baseUrl}/${index}`);
+    const comment = XKCDService.extractComment(rawContentBody);
     const imageUrl = XKCDService.extractImageUrl(rawContentBody);
-    const imageResult = await XKCDService.makeRequest(`https:${imageUrl}`, {encoding: null});
+    const data = await XKCDService.downloadImage(imageUrl);
 
     return {
-      data: imageResult.body,
+      comment,
+      data,
       index,
     };
   },
