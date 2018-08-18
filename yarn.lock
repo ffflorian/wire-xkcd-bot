@@ -109,13 +109,7 @@
   version "8.10.26"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-8.10.26.tgz#950e3d4e6b316ba6e1ae4e84d9155aba67f88c2f"
 
-"@types/request-promise-native@1.0.15":
-  version "1.0.15"
-  resolved "https://registry.yarnpkg.com/@types/request-promise-native/-/request-promise-native-1.0.15.tgz#5b3369fc6aaf9e7fef7b6b688aef4c5759623e16"
-  dependencies:
-    "@types/request" "*"
-
-"@types/request@*":
+"@types/request@2.47.1":
   version "2.47.1"
   resolved "https://registry.yarnpkg.com/@types/request/-/request-2.47.1.tgz#25410d3afbdac04c91a94ad9efc9824100735824"
   dependencies:
@@ -132,9 +126,9 @@
   version "2.3.3"
   resolved "https://registry.yarnpkg.com/@types/tough-cookie/-/tough-cookie-2.3.3.tgz#7f226d67d654ec9070e755f46daebf014628e9d9"
 
-"@wireapp/api-client@1.13.17":
-  version "1.13.17"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-1.13.17.tgz#5ca12d30b32a7aedb9da8b58eb78ab9ca25fedd2"
+"@wireapp/api-client@1.13.18":
+  version "1.13.18"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-1.13.18.tgz#d6a986ce43ea0511cb758999036e8b2a3edab10f"
   dependencies:
     "@types/node" "10.7.1"
     "@types/spark-md5" "3.0.0"
@@ -148,23 +142,23 @@
     spark-md5 "3.0.0"
     tough-cookie "2.4.3"
 
-"@wireapp/bot-api@0.2.34-beta.2":
-  version "0.2.34-beta.2"
-  resolved "https://registry.yarnpkg.com/@wireapp/bot-api/-/bot-api-0.2.34-beta.2.tgz#0acf0c8e26d406fc6c01cd47115156fe6a01ae97"
+"@wireapp/bot-api@0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/bot-api/-/bot-api-0.3.0.tgz#af254aa38f2abe466b41203c3149bd2e4cf7cde6"
   dependencies:
-    "@wireapp/core" "5.8.2"
+    "@wireapp/core" "5.8.3"
     pure-uuid "1.5.3"
 
 "@wireapp/cbor@3.0.73":
   version "3.0.73"
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-3.0.73.tgz#2d11d684e63033a446a4d8e53c5c86c64b010836"
 
-"@wireapp/core@5.8.2":
-  version "5.8.2"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-5.8.2.tgz#79a0d1a7c18ba9740213384e304e21f7fb8f4508"
+"@wireapp/core@5.8.3":
+  version "5.8.3"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-5.8.3.tgz#c24b037c7a68092c966a629c12f580396a6a083a"
   dependencies:
     "@types/node" "10.7.1"
-    "@wireapp/api-client" "1.13.17"
+    "@wireapp/api-client" "1.13.18"
     "@wireapp/cryptobox" "8.7.5"
     "@wireapp/protocol-messaging" "1.20.1"
     "@wireapp/store-engine" "0.12.5"
@@ -732,8 +726,8 @@ safer-buffer@^2.0.2, safer-buffer@^2.1.0, safer-buffer@~2.1.0:
   resolved "https://registry.yarnpkg.com/safer-buffer/-/safer-buffer-2.1.2.tgz#44fa161b0187b9549dd84bb91802f9bd8385cd6a"
 
 semver@^5.5.0:
-  version "5.5.0"
-  resolved "https://registry.yarnpkg.com/semver/-/semver-5.5.0.tgz#dc4bbc7a6ca9d916dee5d43516f0092b58f7b8ab"
+  version "5.5.1"
+  resolved "https://registry.yarnpkg.com/semver/-/semver-5.5.1.tgz#7dfdd8814bdb7cabc7be0fb1d734cfb66c940477"
 
 shebang-command@^1.2.0:
   version "1.2.0"
