@@ -11,12 +11,12 @@ import {XKCDService} from './XKCDService';
 const {version}: {version: string} = require('../package.json');
 
 interface Config {
-  developerConversationId?: string;
+  feedbackConversationId?: string;
 }
 
 class MainHandler extends MessageHandler {
   private readonly logger: logdown.Logger;
-  private readonly developerConversationId?: string;
+  private readonly feedbackConversationId?: string;
   private readonly helpText = `**Hello!** 😎 This is XKCD bot v${version} speaking.\n\nAvailable commands:\n${CommandService.formatCommands()}\n\nMore information about this bot: https://github.com/ffflorian/wire-xkcd-bot.\n\nPlease also visit https://xkcd.com.`;
   private answerCache: {
     [conversationId: string]: {
@@ -27,17 +27,17 @@ class MainHandler extends MessageHandler {
     };
   };
 
-  constructor({developerConversationId}: Config) {
+  constructor({feedbackConversationId}: Config) {
     super();
-    this.developerConversationId = developerConversationId;
+    this.feedbackConversationId = feedbackConversationId;
     this.answerCache = {};
     this.logger = logdown('wire-xkcd-bot/MainHandler', {
       logger: console,
       markdown: false,
     });
 
-    if (!this.developerConversationId) {
-      this.logger.warn('You did not specify a developer conversation ID and will not be able to receive feedback.');
+    if (!this.feedbackConversationId) {
+      this.logger.warn('You did not specify a feedback conversation ID and will not be able to receive feedback.');
     }
   }
 
@@ -189,7 +189,7 @@ class MainHandler extends MessageHandler {
         return this.sendText(conversationId, `> ${comment}`);
       }
       case CommandType.FEEDBACK: {
-        if (!this.developerConversationId) {
+        if (!this.feedbackConversationId) {
           return this.sendText(conversationId, `Sorry, the developer did not specify a feedback channel.`);
         }
 
@@ -202,7 +202,7 @@ class MainHandler extends MessageHandler {
           return this.sendText(conversationId, 'What would you like to tell the developer?');
         }
 
-        await this.sendText(this.developerConversationId, `Feedback from user "${senderId}":\n\n"${content}"`);
+        await this.sendText(this.feedbackConversationId, `Feedback from user "${senderId}":\n\n"${content}"`);
         delete this.answerCache[conversationId];
         return this.sendText(conversationId, 'Thank you for your feedback.');
       }

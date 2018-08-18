@@ -21,7 +21,7 @@ const bot = new Bot({
 });
 
 const mainHandler = new MainHandler({
-  developerConversationId: process.env.DEVELOPER_CONVERSATION_ID!,
+  feedbackConversationId: process.env.WIRE_FEEDBACK_CONVERSATION_ID,
 });
 
 bot.addHandler(mainHandler);
