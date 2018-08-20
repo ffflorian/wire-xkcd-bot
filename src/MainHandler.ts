@@ -100,20 +100,13 @@ class MainHandler extends MessageHandler {
           return this.sendText(conversationId, 'Sorry, an error occured. Please try again later.');
         }
 
-        const {comment, data, index, title} = comicResult;
-
-        const image = {
-          data,
-          height: 289,
-          type: 'image/png',
-          width: 429,
-        };
+        const {comment, index, title} = comicResult;
 
         await this.sendText(
           conversationId,
           `Here is your XKCD comic #${index} (https://xkcd.com/${index}) titled "${title}":`
         );
-        await this.sendImage(conversationId, image);
+        await this.sendImage(conversationId, comicResult);
         return this.sendText(conversationId, `> ${comment}`);
       }
       case CommandType.COMIC: {
@@ -146,20 +139,13 @@ class MainHandler extends MessageHandler {
           }
         }
 
-        const {comment, data, index, title} = comicResult;
-
-        const image = {
-          data,
-          height: 289,
-          type: 'image/png',
-          width: 429,
-        };
+        const {comment, index, title} = comicResult;
 
         await this.sendText(
           conversationId,
           `Here is your XKCD comic #${index} (https://xkcd.com/${index}) titled "${title}":`
         );
-        await this.sendImage(conversationId, image);
+        await this.sendImage(conversationId, comicResult);
         return this.sendText(conversationId, `> ${comment}`);
       }
       case CommandType.LATEST: {
@@ -172,20 +158,13 @@ class MainHandler extends MessageHandler {
           return this.sendText(conversationId, 'Sorry, an error occured. Please try again later.');
         }
 
-        const {comment, data, index, title} = comicResult;
-
-        const image = {
-          data,
-          height: 289,
-          type: 'image/png',
-          width: 429,
-        };
+        const {comment, index, title} = comicResult;
 
         await this.sendText(
           conversationId,
           `Here is your XKCD comic #${index} (https://xkcd.com/${index}) titled "${title}":`
         );
-        await this.sendImage(conversationId, image);
+        await this.sendImage(conversationId, comicResult);
         return this.sendText(conversationId, `> ${comment}`);
       }
       case CommandType.FEEDBACK: {

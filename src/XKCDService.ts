@@ -1,10 +1,12 @@
+import {ImageContent} from '@wireapp/core/dist/conversation/content/';
+import * as ImageTools from './ImageTools';
+
 import * as request from 'request';
 import * as url from 'url';
 import * as logdown from 'logdown';
 
-interface ComicResult {
+interface ComicResult extends ImageContent {
   comment: string;
-  data: Buffer;
   index: number;
   title: string;
 }
@@ -78,8 +80,10 @@ async function buildData(rawContentBody: string): Promise<ComicResult> {
   logger.info('Extracted data', {comment, index, imageUrl, title});
 
   const data = await downloadImage(imageUrl);
+  const imageMetaData = await ImageTools.parseImage(data);
 
   return {
+    ...imageMetaData,
     comment,
     data,
     index,
