@@ -181,7 +181,7 @@ class MainHandler extends MessageHandler {
           return this.sendText(conversationId, 'What would you like to tell the developer?');
         }
 
-        await this.sendText(this.feedbackConversationId, `Feedback from user "${senderId}":\n\n"${content}"`);
+        await this.sendText(this.feedbackConversationId, `Feedback from user "${senderId}":\n"${content}"`);
         delete this.answerCache[conversationId];
         return this.sendText(conversationId, 'Thank you for your feedback.');
       }

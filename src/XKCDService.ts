@@ -27,19 +27,21 @@ function makeRequest(url: string, options: request.CoreOptions = {}): Promise<re
     },
   };
   return new Promise((resolve, reject) =>
-    request.get(url, options, (error: Error, result) => {
-      if (result) {
-        if (result.statusCode === 404) {
-          return reject('Sorry, I could not find this.');
-        }
-        if (result.statusCode !== 200) {
-          return reject(`Sorry, something went wrong (status code ${result.statusCode}).`);
-        }
-        return resolve(result);
-      }
+    request.get(url, options, (error: Error, response) => {
       if (error) {
         return reject(error);
       }
+
+      if (response) {
+        if (response.statusCode === 404) {
+          return reject('Sorry, I could not find this.');
+        }
+        if (response.statusCode !== 200) {
+          return reject(`Sorry, something went wrong (status code ${response.statusCode}).`);
+        }
+        return resolve(response);
+      }
+
       reject('No result and no error.');
     })
   );
