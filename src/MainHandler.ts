@@ -21,7 +21,6 @@ class MainHandler extends MessageHandler {
   private answerCache: {
     [conversationId: string]: {
       content?: string;
-      page: number;
       type: CommandType;
       waitingForContent: boolean;
     };
@@ -70,18 +69,18 @@ class MainHandler extends MessageHandler {
     }
 
     if (this.answerCache[conversationId]) {
-      const {type, waitingForContent} = this.answerCache[conversationId];
-      if (waitingForContent) {
+      const {type: cachedCommandType, waitingForContent} = this.answerCache[conversationId];
+      if (waitingForContent && commandType === cachedCommandType) {
         await this.sendReaction(conversationId, messageId, ReactionType.LIKE);
         delete this.answerCache[conversationId];
-        return this.answer(conversationId, {content, commandType: type, rawCommand}, senderId);
+        return this.answer(conversationId, {content, commandType: cachedCommandType, rawCommand}, senderId);
       }
     }
 
     return this.answer(conversationId, {commandType, content, rawCommand}, senderId);
   }
 
-  async answer(conversationId: string, parsedCommand: ParsedCommand, senderId: string, page = 1) {
+  async answer(conversationId: string, parsedCommand: ParsedCommand, senderId: string) {
     const {content, rawCommand, commandType} = parsedCommand;
     switch (commandType) {
       case CommandType.HELP: {
@@ -112,8 +111,7 @@ class MainHandler extends MessageHandler {
       case CommandType.COMIC: {
         if (!content) {
           this.answerCache[conversationId] = {
-            page,
-            type: CommandType.COMIC,
+            type: commandType,
             waitingForContent: true,
           };
           return this.sendText(conversationId, 'Which comic would you like to see?');
@@ -174,8 +172,7 @@ class MainHandler extends MessageHandler {
 
         if (!content) {
           this.answerCache[conversationId] = {
-            page,
-            type: CommandType.FEEDBACK,
+            type: commandType,
             waitingForContent: true,
           };
           return this.sendText(conversationId, 'What would you like to tell the developer?');
