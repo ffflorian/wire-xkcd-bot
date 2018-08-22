@@ -62,18 +62,20 @@ class MainHandler extends MessageHandler {
 
     switch (commandType) {
       case CommandType.NO_COMMAND:
-      case CommandType.UNKNOWN_COMMAND:
+      case CommandType.UNKNOWN_COMMAND: {
+        if (this.answerCache[conversationId]) {
+          const {type: cachedCommandType, waitingForContent} = this.answerCache[conversationId];
+          if (waitingForContent) {
+            await this.sendReaction(conversationId, messageId, ReactionType.LIKE);
+            delete this.answerCache[conversationId];
+            return this.answer(conversationId, {content, commandType: cachedCommandType, rawCommand}, senderId);
+          }
+        }
+        return;
+      }
+      default: {
+        await this.sendReaction(conversationId, messageId, ReactionType.LIKE);
         break;
-      default:
-        await this.sendReaction(conversationId, messageId, ReactionType.LIKE);
-    }
-
-    if (this.answerCache[conversationId]) {
-      const {type: cachedCommandType, waitingForContent} = this.answerCache[conversationId];
-      if (waitingForContent && commandType === cachedCommandType) {
-        await this.sendReaction(conversationId, messageId, ReactionType.LIKE);
-        delete this.answerCache[conversationId];
-        return this.answer(conversationId, {content, commandType: cachedCommandType, rawCommand}, senderId);
       }
     }
 
