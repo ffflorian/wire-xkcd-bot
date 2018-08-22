@@ -28,9 +28,7 @@ function checkImageType(buf: Buffer, options?: {mask?: number[]; offset?: number
 
   const check = (header: number[], options: ImageCheckOptions) => {
     for (let i = 0; i < header.length; i++) {
-      // If a bitmask is set
       if (options.mask) {
-        // If header doesn't equal `buf` with bits masked off
         if (header[i] !== (options.mask[i] & buf[i + options.offset])) {
           return false;
         }

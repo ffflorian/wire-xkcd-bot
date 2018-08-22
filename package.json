@@ -3,7 +3,7 @@
     "@types/dotenv": "4.0.3",
     "@types/node": "10.7.1",
     "@types/request": "2.47.1",
-    "@wireapp/bot-api": "0.3.2",
+    "@wireapp/bot-api": "0.3.5",
     "cross-env": "5.2.0",
     "dotenv": "6.0.0",
     "jpeg-js": "0.3.4",
