@@ -20,7 +20,6 @@ class MainHandler extends MessageHandler {
   private readonly helpText = `**Hello!** 😎 This is XKCD bot v${version} speaking.\n\nAvailable commands:\n${CommandService.formatCommands()}\n\nMore information about this bot: https://github.com/ffflorian/wire-xkcd-bot.\n\nPlease also visit https://xkcd.com.`;
   private answerCache: {
     [conversationId: string]: {
-      content?: string;
       type: CommandType;
       waitingForContent: boolean;
     };
