@@ -74,11 +74,13 @@ class MainHandler extends MessageHandler {
       }
       default: {
         await this.sendReaction(conversationId, messageId, ReactionType.LIKE);
-        break;
+        if (this.answerCache[conversationId]) {
+          delete this.answerCache[conversationId];
+        }
+        return this.answer(conversationId, {commandType, content, rawCommand}, senderId);
       }
     }
 
-    return this.answer(conversationId, {commandType, content, rawCommand}, senderId);
   }
 
   async answer(conversationId: string, parsedCommand: ParsedCommand, senderId: string) {
