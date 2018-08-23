@@ -16,6 +16,7 @@ interface Config {
 
 class MainHandler extends MessageHandler {
   private readonly logger: logdown.Logger;
+  private readonly xkcdService: XKCDService;
   private readonly feedbackConversationId?: string;
   private readonly helpText = `**Hello!** 😎 This is XKCD bot v${version} speaking.\n\nAvailable commands:\n${CommandService.formatCommands()}\n\nMore information about this bot: https://github.com/ffflorian/wire-xkcd-bot.\n\nPlease also visit https://xkcd.com.`;
   private answerCache: {
@@ -33,6 +34,7 @@ class MainHandler extends MessageHandler {
       logger: console,
       markdown: false,
     });
+    this.xkcdService = new XKCDService();
 
     if (!this.feedbackConversationId) {
       this.logger.warn('You did not specify a feedback conversation ID and will not be able to receive feedback.');
@@ -96,7 +98,7 @@ class MainHandler extends MessageHandler {
         let comicResult;
 
         try {
-          comicResult = await XKCDService.getRandomComic();
+          comicResult = await this.xkcdService.getRandomComic();
         } catch (error) {
           this.logger.error(error);
           return this.sendText(conversationId, 'Sorry, an error occured. Please try again later.');
@@ -127,14 +129,14 @@ class MainHandler extends MessageHandler {
 
         if (parsedArguments === 'latest') {
           try {
-            comicResult = await XKCDService.getLatestComic();
+            comicResult = await this.xkcdService.getLatestComic();
           } catch (error) {
             this.logger.error(error);
             return this.sendText(conversationId, 'Sorry, an error occured. Please try again later.');
           }
         } else if (parsedArguments === 'random') {
           try {
-            comicResult = await XKCDService.getRandomComic();
+            comicResult = await this.xkcdService.getRandomComic();
           } catch (error) {
             this.logger.error(error);
             return this.sendText(conversationId, 'Sorry, an error occured. Please try again later.');
@@ -143,8 +145,11 @@ class MainHandler extends MessageHandler {
           return this.sendText(conversationId, 'Invalid number specified.');
         } else {
           try {
-            comicResult = await XKCDService.getComic(Number(parsedArguments));
+            comicResult = await this.xkcdService.getComic(Number(parsedArguments));
           } catch (error) {
+            if (error.message.includes('404')) {
+              return this.sendText(conversationId, `Sorry, I could not find a comic by ID "${parsedArguments}".`);
+            }
             this.logger.error(error);
             return this.sendText(conversationId, 'Sorry, an error occured. Please try again later.');
           }
@@ -166,7 +171,7 @@ class MainHandler extends MessageHandler {
         let comicResult;
 
         try {
-          comicResult = await XKCDService.getLatestComic();
+          comicResult = await this.xkcdService.getLatestComic();
         } catch (error) {
           this.logger.error(error);
           return this.sendText(conversationId, 'Sorry, an error occured. Please try again later.');
