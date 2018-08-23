@@ -2,10 +2,11 @@
 # yarn lockfile v1
 
 
-"@ffflorian/xkcdjs@1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@ffflorian/xkcdjs/-/xkcdjs-1.0.1.tgz#d9e2dd6ad4ac7c91f4540ab8600086692ce3e987"
+"@ffflorian/xkcdjs@1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@ffflorian/xkcdjs/-/xkcdjs-1.2.0.tgz#b6606f75ba0070067bf6fd2f58ff9eddca5360c3"
   dependencies:
+    "@types/node" "10.7.1"
     axios "0.18.0"
 
 "@protobufjs/aspromise@^1.1.1", "@protobufjs/aspromise@^1.1.2":
