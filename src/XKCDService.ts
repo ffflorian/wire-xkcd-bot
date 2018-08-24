@@ -27,7 +27,7 @@ class XKCDService {
     this.logger.info(`Got random comic with data:`, xkcdResult);
 
     const {alt: comment, data, num: index, title} = xkcdResult;
-    const imageMetaData = await ImageTools.parseImage(data);
+    const imageMetaData = await ImageTools.parseImage(data.data);
 
     return {
       ...imageMetaData,
@@ -42,7 +42,7 @@ class XKCDService {
     this.logger.info(`Got latest comic with data:`, xkcdResult);
 
     const {alt: comment, data, num: index, title} = xkcdResult;
-    const imageMetaData = await ImageTools.parseImage(data);
+    const imageMetaData = await ImageTools.parseImage(data.data);
 
     return {
       ...imageMetaData,
@@ -57,7 +57,7 @@ class XKCDService {
     this.logger.info(`Got comic by ID ${index} with data:`, xkcdResult);
 
     const {alt: comment, data, title} = xkcdResult;
-    const imageMetaData = await ImageTools.parseImage(data);
+    const imageMetaData = await ImageTools.parseImage(data.data);
 
     return {
       ...imageMetaData,
