@@ -82,7 +82,6 @@ class MainHandler extends MessageHandler {
         return this.answer(conversationId, {commandType, parsedArguments, rawCommand}, senderId);
       }
     }
-
   }
 
   async answer(conversationId: string, parsedCommand: ParsedCommand, senderId: string) {
@@ -122,7 +121,10 @@ class MainHandler extends MessageHandler {
             type: commandType,
             waitingForContent: true,
           };
-          return this.sendText(conversationId, 'Which comic would you like to see? Answer with a number, "random" or "latest"');
+          return this.sendText(
+            conversationId,
+            'Which comic would you like to see? Answer with a number, "random" or "latest"'
+          );
         }
 
         let comicResult;

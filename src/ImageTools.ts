@@ -2,8 +2,7 @@ import {ImageContent} from '@wireapp/core/dist/conversation/content/';
 import * as logdown from 'logdown';
 
 import {ImageData as XKCDImageData} from '@ffflorian/xkcdjs';
-import {GifReader as GIFReader} from 'omggif'
-;
+import {GifReader as GIFReader} from 'omggif';
 const PNGReader = require('png.js');
 const JPEGReader = require('jpeg-js');
 
