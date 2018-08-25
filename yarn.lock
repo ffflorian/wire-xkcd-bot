@@ -121,6 +121,12 @@
   version "8.10.26"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-8.10.26.tgz#950e3d4e6b316ba6e1ae4e84d9155aba67f88c2f"
 
+"@types/omggif@1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@types/omggif/-/omggif-1.0.0.tgz#342e69c0299bb23da0f29bc2805bbc8b4bc4a781"
+  dependencies:
+    "@types/node" "*"
+
 "@types/request@2.47.1":
   version "2.47.1"
   resolved "https://registry.yarnpkg.com/@types/request/-/request-2.47.1.tgz#25410d3afbdac04c91a94ad9efc9824100735824"

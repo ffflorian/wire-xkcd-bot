@@ -1,20 +1,16 @@
 import {ImageContent} from '@wireapp/core/dist/conversation/content/';
 import * as logdown from 'logdown';
 
-import {ImageData as XKCDImageData} from '@ffflorian/xkcdjs/dist/XKCDResult';
+import {ImageData as XKCDImageData} from '@ffflorian/xkcdjs';
+import {GifReader as GIFReader} from 'omggif'
+;
 const PNGReader = require('png.js');
 const JPEGReader = require('jpeg-js');
-const {GifReader: GIFReader} = require('omggif');
 
 const logger = logdown('wire-xkcd-bot/ImageTools', {
   logger: console,
   markdown: false,
 });
-
-interface ImageData {
-  extension: string;
-  mimeType: string;
-}
 
 export async function parseImage(image: XKCDImageData): Promise<ImageContent> {
   const {data: buffer, mimeType} = image;
