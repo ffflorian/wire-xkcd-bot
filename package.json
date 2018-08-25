@@ -8,7 +8,6 @@
     "@types/png.js": "0.2.0",
     "@types/request": "2.47.1",
     "@wireapp/bot-api": "0.3.11",
-    "cross-env": "5.2.0",
     "dotenv": "6.0.0",
     "jpeg-js": "0.3.4",
     "logdown": "3.2.7",
@@ -16,6 +15,7 @@
     "png.js": "0.2.1"
   },
   "devDependencies": {
+    "cross-env": "5.2.0",
     "prettier": "1.14.2",
     "rimraf": "2.6.2",
     "typescript": "3.0.1"
