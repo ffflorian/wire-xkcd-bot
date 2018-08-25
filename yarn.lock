@@ -101,6 +101,12 @@
   dependencies:
     "@types/node" "*"
 
+"@types/jpeg-js@0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@types/jpeg-js/-/jpeg-js-0.3.0.tgz#5971f0aa50900194e9565711c265c10027385e89"
+  dependencies:
+    "@types/node" "*"
+
 "@types/long@^3.0.32":
   version "3.0.32"
   resolved "https://registry.yarnpkg.com/@types/long/-/long-3.0.32.tgz#f4e5af31e9e9b196d8e5fca8a5e2e20aa3d60b69"
@@ -126,6 +132,10 @@
   resolved "https://registry.yarnpkg.com/@types/omggif/-/omggif-1.0.0.tgz#342e69c0299bb23da0f29bc2805bbc8b4bc4a781"
   dependencies:
     "@types/node" "*"
+
+"@types/png.js@0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@types/png.js/-/png.js-0.2.0.tgz#f90f5d538e4d608f32ddfc2921b575942277edb9"
 
 "@types/request@2.47.1":
   version "2.47.1"

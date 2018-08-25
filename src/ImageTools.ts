@@ -3,8 +3,8 @@ import * as logdown from 'logdown';
 
 import {ImageData as XKCDImageData} from '@ffflorian/xkcdjs';
 import {GifReader as GIFReader} from 'omggif';
-const PNGReader = require('png.js');
-const JPEGReader = require('jpeg-js');
+import PNGReader = require('png.js');
+import * as JPEGReader from 'jpeg-js';
 
 const logger = logdown('wire-xkcd-bot/ImageTools', {
   logger: console,
@@ -31,7 +31,7 @@ export async function parseImage(image: XKCDImageData): Promise<ImageContent> {
     }
     case 'image/png': {
       await new Promise((resolve, reject) => {
-        new PNGReader(buffer).parse((error: Error, png: any) => {
+        new PNGReader(buffer).parse((error, png) => {
           if (error) {
             return reject(error);
           }
